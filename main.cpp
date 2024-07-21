@@ -26,8 +26,24 @@ double Formula(double Latitude_1, double Longitute_1, double Latitude_2, double 
 
 class Drawer : public osmium::draw::draw{
     public:
-        Graph 
+        AdjancencyList& graph;
+        int Node_Total = 0;
+
+        cosnt int Node_Max = 100000;
+        Drawer(AdjancencyList& list) : graph(list) {}
+
+        void nodes(cosnt osmium::Node& nodes){
+            if (Node_Total < Node_Max) {
+                graph.Node_Insertion(node.id(), node.location.Lat(), node.location.Long());
+                Node_Total++;
+            }
+        }
+
+        void Direction (const osmium::Direction& Direct){
+            const auto& Direction_of_Node = Direct.
+        }
 }
+
 
 int main (){
     sf::RenderWindow window(sf::VideoMode(800, 600), "Project 3");
