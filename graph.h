@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <set>
 #include <queue>
+#include <string>
 
 #ifndef COP3530_PROJECT_3_GRAPH_H
 #define COP3530_PROJECT_3_GRAPH_H
