@@ -51,12 +51,12 @@ public:
 				vector<int> pathTrace;
 				for (int i = endID; i != -1; i = previous[i])
 				{
-					path.pushback(i);
+					pathTrace.push_back(i);
 				}
 
 				//reverse order of path
-				reverse(path.begin(), path.end());
-				return path;
+				reverse(pathTrace.begin(), path.end());
+				return pathTrace;
 			}
 
 			queue.pop();
