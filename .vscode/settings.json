@@ -3,6 +3,9 @@
         "cmath": "cpp",
         "unordered_map": "cpp",
         "iostream": "cpp",
-        "queue": "cpp"
+        "queue": "cpp",
+        "chrono": "cpp",
+        "span": "cpp",
+        "utility": "cpp"
     }
 }

@@ -11,9 +11,9 @@
 //Earth Radius in Kilometers found online
 const double EarthR = 6378.0;
 
-double Formula(double Latitude_1, double Longitute_1, double Latitude_2, double Longitute_2){
+double Formula(double Latitude_1, double Longitude_1, double Latitude_2, double Longitude_2){
     double Longitude = (Latitude_2 - Latitude_1) * pi / 180.0;
-    double Latitude = (Longitute_2 - Longitute_1) * pi / 180.0;
+    double Latitude = (Longitude_2 - Longitude_1) * pi / 180.0;
 
     Latitude_1 = Latitude_1 * pi / 180.0;
     Latitude_2 = Latitude_2 * pi / 180.0;
@@ -24,7 +24,7 @@ double Formula(double Latitude_1, double Longitute_1, double Latitude_2, double 
     return final;
 }
 
-class Drawer : public osmium::draw::draw{
+class Drawer : public osmium::handler::Handler{
     public:
         AdjancencyList& graph;
         int Node_Total = 0;
@@ -34,18 +34,69 @@ class Drawer : public osmium::draw::draw{
 
         void nodes(cosnt osmium::Node& nodes){
             if (Node_Total < Node_Max) {
-                graph.Node_Insertion(node.id(), node.location.Lat(), node.location.Long());
+                graph.insertNode(node.id(), node.location.Lat(), node.location.Long());
                 Node_Total++;
             }
         }
 
-        void Direction (const osmium::Direction& Direct){
-            const auto& Direction_of_Node = Direct.
+        void Direction (const osmium::Way& Direct){
+            const auto& Direction_of_Node = Direct.nodes();
+            for (size_t x = 1; x, Direction_of_Node.size(); i++){
+                auto Node_1 = Direction_of_Node[i-1].ref();
+                auto Node_2 = Direction_of_Node[i].ref();
+                if (graph.getNodeLoc().count(Node_1)&&graph.getNodeLoc().count(Node_2))
+                {
+                    double Latitude_1 = graph.getNodeLoc().at(Node_1).first;
+                    double Longitude_1 = graph.getNodeLoc().at(Node_1).second;
+                    double Latitude_2 = graph.getNodeLoc().at(Node_2).first;
+                    double Longitude_2 = graph.getNodeLoc().at(Node_2).second;
+                    double Dist = Formula(Latitude_1, Longitude_1, Latitude_2, Longitude_2);
+                    graph.insertEdge(Node_1, Node_2, Dist);
+                }
+            }
         }
+};
+
+void OSMDATA(const string& name, AdjancencyList& graph){
+    osmium::io::Reader reader(name);
+    Drawer handler(graph);
+    osmium::apply(reader, handler);
+    reader.close();
+}
+
+void GraphVisual(sf::RenderWindow& window, const AdjancencyList& graph){
+    sf::CircleShape nodeShape(2);
+    nodeShape.setFillColor(sf::Color::Blue);
+    sf::VertexArray edges(sf::Lines);
+    for (const auto& couple : graph.getAdjList()) {
+        int Node_1 = couple.first;
+        double Latitude_1 = graph.getNodeLoc().at(Node_1).first;
+        double Longitude_1 = graph.getNodeLoc().at(Node_1).second;
+        for(const auto& neighbors : couple.second) {
+            int Node_2 = neighbors.first;
+            double Latitude_2 = graph.getNodeLoc().at(Node_2).first;
+            double Longitude_2 = graph.getNodeLoc().at(Node_2).second;
+            sf::Vector2f pos1(Longitude_1 * 1000, Latitude_1 * 1000);
+            sf::Vector2f pos2(Longitude_2 * 1000, Latitude_2 * 1000);
+            edges.append(sf::Vertex(pos1, sf::Color::White));
+            edges.append(sf::Vertex(pos1, sf::Color::White));
+        }
+    }
+    window.draw(edges);
+    for(const auto& node : graph.getNodeLoc()){
+        double Latitude = node.second.first;
+        double Longitude = node.second.second;
+        nodeShape.setPosition(Longitiude * 1000, Latitude * 1000);
+        window.draw(nodeShape);
+    }
 }
 
 
 int main (){
+    string osm_filename = "florida-latest.osm.pbf";
+    AdjancencyList graph;
+    OSMDATA(osm_filename, graph);
+
     sf::RenderWindow window(sf::VideoMode(800, 600), "Project 3");
     
     while (window.isOpen())
@@ -57,9 +108,7 @@ int main (){
                 window.close();
         }
         window.clear();
-        /* This will show the actual graph in the window, set up later
-        window.draw(example);
-        */
+        GraphVisual(window, graph)
         window.dislplay();
     }
     return 0;
