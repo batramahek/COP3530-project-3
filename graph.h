@@ -29,22 +29,52 @@ public:
 	//code referenced from Lecture Slides - Mod 8a - Graphs Terminology and Implementation -- slide 64
 	vector<int> bfs(int startID, int endID)
 	{
+		//create containers for bfs
 		set<int> visited;
 		queue<int> queue;
+		unordered_map<int, int> previous;
 
+		//insert and push startID into visited and queue
 		visited.insert(startID);
 		queue.push(startID);
+		
+		//set node previous to start id as -1
+		previous[startID] = -1;
 
 		while (!queue.empty())
 		{
 			int u = queue.front();
-			queue.pop();
 
+			//checks if u is the same as the endID, add it to the path and keep adding the previous nodes until it reaches the previous[start] which is -1
 			if (u == endID)
 			{
-				//ctor<int> pathTrace;
-				//for (int i = end; i != start
+				vector<int> pathTrace;
+				for (int i = endID; i != -1; i = previous[i])
+				{
+					path.pushback(i);
+				}
+
+				//reverse order of path
+				reverse(path.begin(), path.end());
+				return path;
 			}
+
+			queue.pop();
+
+			//check if element is in the visited set, if its not, add it to vector and queue
+			vector<int> neighbours = graph[u];
+			for (int v : neighbours)
+			{
+				if (visited.count(v) == 0)
+				{
+					visited.insert(v);
+					queue.push(v);
+				}
+			}
+
+			//no path found
+			return {};
+
 		}
 	}
 	vector<int> dijkstras(int startID, int endID);
