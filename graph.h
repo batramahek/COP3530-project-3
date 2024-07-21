@@ -37,8 +37,8 @@ public:
 
 		while (!queue.empty())
 		{
-			int u = q.front();
-			q.pop();
+			int u = queue.front();
+			queue.pop();
 
 			if (u == endID)
 			{
