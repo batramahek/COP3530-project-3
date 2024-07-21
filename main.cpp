@@ -29,12 +29,12 @@ class Drawer : public osmium::handler::Handler{
         AdjancencyList& graph;
         int Node_Total = 0;
 
-        cosnt int Node_Max = 100000;
+        const int Node_Max = 100000;
         Drawer(AdjancencyList& list) : graph(list) {}
 
         void nodes(cosnt osmium::Node& nodes){
             if (Node_Total < Node_Max) {
-                graph.insertNode(node.id(), node.location.Lat(), node.location.Long());
+                graph.insertNode(nodes.id(), nodes.location.Lat(), nodes.location.Long());
                 Node_Total++;
             }
         }
@@ -86,7 +86,7 @@ void GraphVisual(sf::RenderWindow& window, const AdjancencyList& graph){
     for(const auto& node : graph.getNodeLoc()){
         double Latitude = node.second.first;
         double Longitude = node.second.second;
-        nodeShape.setPosition(Longitiude * 1000, Latitude * 1000);
+        nodeShape.setPosition(Longitude * 1000, Latitude * 1000);
         window.draw(nodeShape);
     }
 }
@@ -102,13 +102,13 @@ int main (){
     while (window.isOpen())
     {
         sf::Event event;
-        while (window.pollEven(event))
+        while (window.pollEvent(event))
         {
             if(event.type == sf::Event::Closed)
                 window.close();
         }
         window.clear();
-        GraphVisual(window, graph)
+        GraphVisual(window, graph);
         window.dislplay();
     }
     return 0;
