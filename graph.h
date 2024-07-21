@@ -11,7 +11,7 @@
 
 using namespace std; 
 
-class AdjancencyList
+class AdjacencyList
 {
 private:
 	unordered_multimap<string, vector<pair<string, double>>> graph;
@@ -78,7 +78,7 @@ public:
 		}
 	}
 	vector<int> dijkstras(int startID, int endID);
-	unordered_multimap<int, pair<int, double>>& getAdjancencyList()
+	unordered_multimap<int, pair<int, double>>& getAdjacencyList()
 	{
 		return graph;
 	}
