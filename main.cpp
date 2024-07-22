@@ -3,9 +3,9 @@
 #include <unordered_map>
 #include <iostream>
 #include <unordered_map>
-#include <osmium/io/any_input.hpp>
-#include <osmium/handler.hpp>
-#include <osmium/visitor.hpp>
+#include <any_input.hpp>
+#include <handler.hpp>
+#include <visitor.hpp>
 #define pi 3.14159265358979323846
 
 //Earth Radius in Kilometers found online
