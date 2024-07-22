@@ -11,6 +11,7 @@
 //Earth Radius in Kilometers found online
 const double EarthR = 6378.0;
 
+//formula to calculate weights based on longitude and latitude
 double Formula(double Latitude_1, double Longitude_1, double Latitude_2, double Longitude_2) {
     double Longitude = (Latitude_2 - Latitude_1) * pi / 180.0;
     double Latitude = (Longitude_2 - Longitude_1) * pi / 180.0;

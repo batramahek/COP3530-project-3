@@ -29,7 +29,7 @@ public:
 	{
 		graph.insert({ fromID, {{toID, weight}} });
 	}
-	//code referenced from Lecture Slides - Mod 8a - Graphs Terminology and Implementation -- slide 64
+	//code referenced from Lecture Slides - Mod 8a - Graphs Terminology and Implementation -- slide 63
 	vector<int> bfs(int startID, int endID)
 	{
 		//create containers for bfs
