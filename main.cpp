@@ -111,6 +111,7 @@ void GraphVisual(sf::RenderWindow& window, AdjacencyList& graph) {
 
 
 int main() {
+    //store osm file name and pass through function to load data
     string osm_filename = "florida-latest.osm.pbf";
     AdjacencyList graph;
     OSMDATA(osm_filename, graph);
