@@ -57,6 +57,7 @@ public:
     }
 };
 
+//function to load OSM data
 void OSMDATA(const string& name, AdjacencyList& graph) {
     osmium::io::Reader reader(name);
     Drawer handler(graph);

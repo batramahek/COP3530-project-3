@@ -57,7 +57,7 @@ public:
 					pathTrace.push_back(i);
 				}
 
-				//reverse order of path
+				//reverse order of path since path contains endID to fromID instead of fromID to endID
 				reverse(pathTrace.begin(), pathTrace.end());
 				return pathTrace;
 			}
