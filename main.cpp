@@ -47,12 +47,18 @@ public:
             auto Node_2 = Direction_of_Node[x].ref();
             if (graph.getNodeLoc().count(Node_1) && graph.getNodeLoc().count(Node_2))
             {
-                double Latitude_1 = graph.getNodeLoc().at(Node_1).first;
-                double Longitude_1 = graph.getNodeLoc().at(Node_1).second;
-                double Latitude_2 = graph.getNodeLoc().at(Node_2).first;
-                double Longitude_2 = graph.getNodeLoc().at(Node_2).second;
-                double Dist = Formula(Latitude_1, Longitude_1, Latitude_2, Longitude_2);
-                graph.insertEdge(Node_1, Node_2, Dist);
+                auto it1 = graph.getNodeLoc().equal_range(Node_1);
+                auto it2 = graph.getNodeLoc().equal_range(Node_2);
+
+                if (it1.first != it1.second && it2.first != it2.second)
+                {
+                    double Latitude_1 = it1.first->second.first;
+                    double Longitude_1 = it1.first->second.second;
+                    double Latitude_2 = it2.first->second.first;
+                    double Longitude_2 = it2.first->second.second;
+                    double Dist = Formula(Latitude_1, Longitude_1, Latitude_2, Longitude_2);
+                    graph.insertEdge(Node_1, Node_2, Dist);
+                }
             }
         }
     }
@@ -66,26 +72,36 @@ void OSMDATA(const string& name, AdjacencyList& graph) {
     reader.close();
 }
 
-void GraphVisual(sf::RenderWindow& window, const AdjacencyList& graph) {
+void GraphVisual(sf::RenderWindow& window, AdjacencyList& graph) {
     sf::CircleShape nodeShape(2);
     nodeShape.setFillColor(sf::Color::Blue);
     sf::VertexArray edges(sf::Lines);
     for (const auto& couple : graph.getAdjacencyList()) {
         int Node_1 = couple.first;
-        double Latitude_1 = graph.getNodeLoc().at(Node_1).first;
-        double Longitude_1 = graph.getNodeLoc().at(Node_1).second;
-        for (const auto& neighbors : couple.second) {
-            int Node_2 = neighbors.first;
-            double Latitude_2 = graph.getNodeLoc().at(Node_2).first;
-            double Longitude_2 = graph.getNodeLoc().at(Node_2).second;
-            sf::Vector2f pos1(Longitude_1 * 1000, Latitude_1 * 1000);
-            sf::Vector2f pos2(Longitude_2 * 1000, Latitude_2 * 1000);
-            edges.append(sf::Vertex(pos1, sf::Color::White));
-            edges.append(sf::Vertex(pos1, sf::Color::White));
+        auto it1 = graph.getNodeLoc().equal_range(Node_1);
+        if (it1.first != it1.second)
+        {
+            double Latitude_1 = it1.first->second.first;
+            double Longitude_1 = it1.first->second.second;
+
+            for (const auto& neighbors : couple.second) {
+                int Node_2 = neighbors.first;
+                auto it2 = graph.getNodeLoc().equal_range(Node_2);
+                if (it2.first != it2.second)
+                {
+                    double Latitude_2 = it2.first->second.first;
+                    double Longitude_2 = it2.first->second.second;
+                    sf::Vector2f pos1(Longitude_1 * 1000, Latitude_1 * 1000);
+                    sf::Vector2f pos2(Longitude_2 * 1000, Latitude_2 * 1000);
+                    edges.append(sf::Vertex(pos1, sf::Color::White));
+                    edges.append(sf::Vertex(pos1, sf::Color::White));
+                }
+            }
         }
     }
     window.draw(edges);
-    for (const auto& node : graph.getNodeLoc()) {
+    for (const auto& node : graph.getNodeLoc()) 
+    {
         double Latitude = node.second.first;
         double Longitude = node.second.second;
         nodeShape.setPosition(Longitude * 1000, Latitude * 1000);

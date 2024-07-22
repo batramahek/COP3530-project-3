@@ -65,20 +65,26 @@ public:
 			queue.pop();
 
 			//check if element is in the visited set, if its not, add it to vector and queue
-			vector<int> neighbours = graph[u];
-			for (const auto& v : neighbours)
+			vector<int> neighbours;
+			auto it = graph.equal_range(u);
+			for (auto& i = it.first; i != it.second; ++i)
 			{
-				if (visited.count(v) == 0)
+
+				for (const auto& neighbour : i->second)
 				{
-					visited.insert(v);
-					queue.push(v);
+					int v = neighbour.first;
+					if (visited.count(v) == 0)
+					{
+						visited.insert(v);
+						queue.push(v);
+					}
 				}
+
 			}
-
-			//no path found
-			return {};
-
 		}
+
+		//no path found
+		return {};
 	}
 	vector<int> dijkstras(int startID, int endID);
 	unordered_multimap<int, vector<pair<int, double>>>& getAdjacencyList()
