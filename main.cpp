@@ -45,7 +45,7 @@ public:
     //override way function
     void way(const osmium::Way& Direct) {
         const auto& Direction_of_Node = Direct.nodes();
-        for (size_t x = 1; x, Direction_of_Node.size(); x++) {
+        for (size_t x = 1; x < Direction_of_Node.size(); x++) {
             auto Node_1 = Direction_of_Node[x - 1].ref();
             auto Node_2 = Direction_of_Node[x].ref();
             if (graph.getNodeLoc().count(Node_1) && graph.getNodeLoc().count(Node_2))
