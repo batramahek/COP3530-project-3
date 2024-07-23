@@ -19,6 +19,7 @@ class AdjacencyList
 private:
 	//graph structure
 	unordered_multimap<int, vector<pair<int, double>>> graph;
+	//store lat and long of nodes
 	unordered_multimap<int, pair<double, double>> nodeLocations;
 
 public:

@@ -100,7 +100,7 @@ void GraphVisual(sf::RenderWindow& window, AdjacencyList& graph) {
         }
     }
     window.draw(edges);
-    for (const auto& node : graph.getNodeLoc()) 
+    for (const auto& node : graph.getNodeLoc())
     {
         double Latitude = node.second.first;
         double Longitude = node.second.second;
@@ -110,7 +110,7 @@ void GraphVisual(sf::RenderWindow& window, AdjacencyList& graph) {
 }
 
 
-int main() 
+int main()
 {
     //store osm file name and pass through function to load data
     string osm_filename = "florida-latest.osm.pbf";
