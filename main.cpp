@@ -38,6 +38,8 @@ public:
         if (Node_Total < Node_Max) {
             graph.insertNode(nodes.id(), nodes.location().lat(), nodes.location().lon());
             Node_Total++;
+
+            cout << "Node ID: " << nodes.id() << "\t" << Node_Total << "\t";
         }
     }
 
@@ -45,22 +47,36 @@ public:
     //override way function
     void way(const osmium::Way& Direct) {
         const auto& Direction_of_Node = Direct.nodes();
-        for (size_t x = 1; x < Direction_of_Node.size(); x++) {
+        for (size_t x = 1; x < Direction_of_Node.size(); ++x) {
             auto Node_1 = Direction_of_Node[x - 1].ref();
             auto Node_2 = Direction_of_Node[x].ref();
+
+            cout << "Processing nodes: " << Node_1 << " and " << Node_2 << std::endl;
+
             if (graph.getNodeLoc().count(Node_1) && graph.getNodeLoc().count(Node_2))
             {
+                cout << "if statement works" << endl;
                 auto it1 = graph.getNodeLoc().equal_range(Node_1);
                 auto it2 = graph.getNodeLoc().equal_range(Node_2);
 
-                if (it1.first != it1.second && it2.first != it2.second)
+                cout << "iterators created" << endl;
+
+                for (auto i = it1.first; i != it1.second; i++)
                 {
-                    double Latitude_1 = it1.first->second.first;
-                    double Longitude_1 = it1.first->second.second;
-                    double Latitude_2 = it2.first->second.first;
-                    double Longitude_2 = it2.first->second.second;
-                    double Dist = Formula(Latitude_1, Longitude_1, Latitude_2, Longitude_2);
-                    graph.insertEdge(Node_1, Node_2, Dist);
+                    cout << "loop 1" << endl;
+                    for (auto j = it2.first; j != it2.second; j++)
+                    {
+                        cout << "loop 2" << endl;
+                        double Latitude_1 = i->second.first;
+                        double Longitude_1 = i->second.second;
+                        cout << "lat/lon 1 done" << endl;
+                        double Latitude_2 = j->second.first;
+                        double Longitude_2 = j->second.second;
+                        cout << "lat/lon 2 done" << endl;
+                        double Dist = Formula(Latitude_1, Longitude_1, Latitude_2, Longitude_2);
+                        graph.insertEdge(Node_1, Node_2, Dist);
+                        cout << "edge between: " << Node_1 << " and " << Node_2 << endl;
+                    }
                 }
             }
         }
@@ -118,7 +134,10 @@ int main()
     //store osm file name and pass through function to load data
     string osm_filename = "florida-latest.osm.pbf";
     AdjacencyList graph;
+    cout << "loading data in" << endl;
     OSMDATA(osm_filename, graph);
+
+    cout << "loaded data, now opening window" << endl;
 
     sf::RenderWindow window(sf::VideoMode(800, 600), "Project 3");
 
