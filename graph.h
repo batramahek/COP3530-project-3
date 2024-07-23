@@ -17,6 +17,7 @@ using namespace std;
 class AdjacencyList
 {
 private:
+	//graph structure
 	unordered_multimap<int, vector<pair<int, double>>> graph;
 	unordered_multimap<int, pair<double, double>> nodeLocations;
 

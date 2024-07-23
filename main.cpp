@@ -3,9 +3,9 @@
 #include <unordered_map>
 #include <iostream>
 #include <unordered_map>
-#include <any_input.hpp>
-#include <handler.hpp>
-#include <visitor.hpp>
+#include <osmium/io/any_input.hpp>
+#include <osmium/handler.hpp>
+#include <osmium/visitor.hpp>
 #define pi 3.14159265358979323846
 
 //Earth Radius in Kilometers found online
@@ -35,7 +35,7 @@ public:
 
     void nodes(const osmium::Node& nodes) {
         if (Node_Total < Node_Max) {
-            graph.insertNode(nodes.id(), nodes.location.Lat(), nodes.location.Long());
+            graph.insertNode(nodes.id(), nodes.location().lat(), nodes.location().lon());
             Node_Total++;
         }
     }
@@ -110,7 +110,8 @@ void GraphVisual(sf::RenderWindow& window, AdjacencyList& graph) {
 }
 
 
-int main() {
+int main() 
+{
     //store osm file name and pass through function to load data
     string osm_filename = "florida-latest.osm.pbf";
     AdjacencyList graph;
