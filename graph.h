@@ -89,6 +89,7 @@ public:
 		return {};
 	}
 	vector<int> dijkstras(int startID, int endID);
+
 	unordered_multimap<int, vector<pair<int, double>>>& getAdjacencyList()
 	{
 		return graph;

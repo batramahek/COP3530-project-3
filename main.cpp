@@ -33,14 +33,17 @@ public:
     const int Node_Max = 100000;
     Drawer(AdjacencyList& list) : graph(list) {}
 
-    void nodes(const osmium::Node& nodes) {
+    //override node function
+    void node(const osmium::Node& nodes) {
         if (Node_Total < Node_Max) {
             graph.insertNode(nodes.id(), nodes.location().lat(), nodes.location().lon());
             Node_Total++;
         }
     }
 
-    void Direction(const osmium::Way& Direct) {
+
+    //override way function
+    void way(const osmium::Way& Direct) {
         const auto& Direction_of_Node = Direct.nodes();
         for (size_t x = 1; x, Direction_of_Node.size(); x++) {
             auto Node_1 = Direction_of_Node[x - 1].ref();
