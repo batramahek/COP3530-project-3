@@ -3,6 +3,12 @@
 // Created by Mahek Batra on 2024-07-15.
 //
 #include <unordered_map>
+#include <vector>
+#pragma once
+//
+// Created by Mahek Batra on 2024-07-15.
+//
+#include <unordered_map>
 #include <set>
 #include <queue>
 #include <string>
@@ -19,7 +25,7 @@ class AdjacencyList
 private:
 	//graph structure
 	unordered_multimap<int, vector<pair<int, double>>> graph;
-	//store lat and long of nodes
+	//store lat and long of nodes as pair
 	unordered_multimap<int, pair<double, double>> nodeLocations;
 
 public:
@@ -94,7 +100,7 @@ public:
 	{
 		return graph;
 	}
-	unordered_multimap<int, pair<double, double>> getNodeLoc()
+	unordered_multimap<int, pair<double, double>>& getNodeLoc()
 	{
 		return nodeLocations;
 	}
