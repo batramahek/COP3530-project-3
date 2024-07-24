@@ -94,7 +94,7 @@ public:
 	{
 		return graph;
 	}
-	unordered_multimap<int, pair<double, double>> getNodeLoc()
+	unordered_multimap<int, pair<double, double>>& getNodeLoc()
 	{
 		return nodeLocations;
 	}
