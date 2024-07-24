@@ -38,32 +38,39 @@ public:
         if (Node_Total < Node_Max) {
             graph.insertNode(nodes.id(), nodes.location().lat(), nodes.location().lon());
             Node_Total++;
+
+            cout << "Node ID: " << nodes.id() << "\t" << Node_Total << "\t";
         }
     }
 
 
     //override way function
     void way(const osmium::Way& Direct) {
-        const auto& Direction_of_Node = Direct.nodes();
-        for (size_t x = 1; x < Direction_of_Node.size(); x++) {
-            auto Node_1 = Direction_of_Node[x - 1].ref();
-            auto Node_2 = Direction_of_Node[x].ref();
-            if (graph.getNodeLoc().count(Node_1) && graph.getNodeLoc().count(Node_2))
-            {
-                auto it1 = graph.getNodeLoc().equal_range(Node_1);
-                auto it2 = graph.getNodeLoc().equal_range(Node_2);
+        const osmium::NodeRefList& direction_of_nodes = Direct.nodes();
 
-                if (it1.first != it1.second && it2.first != it2.second)
-                {
-                    double Latitude_1 = it1.first->second.first;
-                    double Longitude_1 = it1.first->second.second;
-                    double Latitude_2 = it2.first->second.first;
-                    double Longitude_2 = it2.first->second.second;
-                    double Dist = Formula(Latitude_1, Longitude_1, Latitude_2, Longitude_2);
-                    graph.insertEdge(Node_1, Node_2, Dist);
+        for (auto it = direction_of_nodes.begin(); it != direction_of_nodes.end(); it++) {
+            auto it2 = std::next(it);
+            if (it2 != direction_of_nodes.end()) {
+                int fromID = it->ref();
+                int toID = it2->ref();
+
+                // Retrieve the locations from the graph
+                auto from = graph.getNodeLoc().find(fromID);
+                auto to = graph.getNodeLoc().find(toID);
+
+                if (from != graph.getNodeLoc().end() && to != graph.getNodeLoc().end()) {
+                    double lat1 = from->second.first;
+                    double lon1 = from->second.second;
+                    double lat2 = to->second.first;
+                    double lon2 = to->second.second;
+
+                    double dist = Formula(lat1, lon1, lat2, lon2);
+                    graph.insertEdge(fromID, toID, dist);
                 }
+
             }
         }
+
     }
 };
 
@@ -97,7 +104,7 @@ void GraphVisual(sf::RenderWindow& window, AdjacencyList& graph) {
                     sf::Vector2f pos1(Longitude_1 * 1000, Latitude_1 * 1000);
                     sf::Vector2f pos2(Longitude_2 * 1000, Latitude_2 * 1000);
                     edges.append(sf::Vertex(pos1, sf::Color::White));
-                    edges.append(sf::Vertex(pos1, sf::Color::White));
+                    edges.append(sf::Vertex(pos2, sf::Color::White));
                 }
             }
         }
@@ -118,7 +125,10 @@ int main()
     //store osm file name and pass through function to load data
     string osm_filename = "florida-latest.osm.pbf";
     AdjacencyList graph;
+    cout << "loading data in" << endl;
     OSMDATA(osm_filename, graph);
+
+    cout << "loaded data, now opening window" << endl;
 
     sf::RenderWindow window(sf::VideoMode(800, 600), "Project 3");
 
