@@ -12,6 +12,7 @@
 #include <set>
 #include <queue>
 #include <string>
+#include <functional> // for priority queue
 
 
 
@@ -94,7 +95,22 @@ public:
 		//no path found return empty
 		return {};
 	}
-	vector<int> dijkstras(int startID, int endID);
+/*
+	vector<int> dijkstras(int startID, int endID) {    //Justin Sui 7/25-7/26
+		priority_queue<pair<double, int>, vector<pair<double, int>>, greater<>> pq;
+		unordered_map<int, double> distances;
+        	unordered_map<int, int> previous;
+        	set<int> visited;
+
+  		distances[startID] = 0.0;
+        	pq.push({0.0, startID});
+	 
+	 	while (!pq.empty()) {
+   			//not done
+        	{
+	 	return {}; //no path found
+	}
+*/
 
 	unordered_multimap<int, vector<pair<int, double>>>& getAdjacencyList()
 	{
