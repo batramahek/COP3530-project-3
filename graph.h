@@ -95,7 +95,7 @@ public:
 		//no path found return empty
 		return {};
 	}
-/*
+
 	vector<int> dijkstras(int startID, int endID) {    //Justin Sui 7/25-7/26
 		priority_queue<pair<double, int>, vector<pair<double, int>>, greater<>> pq;
 		unordered_map<int, double> distances;
@@ -106,11 +106,36 @@ public:
         	pq.push({0.0, startID});
 	 
 	 	while (!pq.empty()) {
-   			//not done
-        	{
+   			double dist = pq.top().first;
+            		int x = pq.top().second;
+            		pq.pop();
+
+            		if (visited.find(x) != visited.end()) {
+                		continue;
+			}
+            		visited.insert(x);
+        		if (x == endID) { //construct shortest path
+                		vector<int> pt;
+                		for (int i = endID; i != -1; i = previous[i]) {
+                    		pt.push_back(i);
+                		}
+                		reverse(pt.begin(), pt.end());
+                		return pt;
+            		}
+
+            		for (auto& neighbor : graph[x]) {
+                		int y = neighbor.first;
+                		double weight = neighbor.second;
+                		if (visited.find(y) == visited.end() && dist + weight < distances[y]) {
+                    			distances[y] = dist + weight;
+                    			pq.push({distances[y], y});
+                    			previous[y] = x;
+                		}
+            		}
+		}
 	 	return {}; //no path found
 	}
-*/
+
 
 	unordered_multimap<int, vector<pair<int, double>>>& getAdjacencyList()
 	{
