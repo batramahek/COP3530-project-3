@@ -27,17 +27,22 @@ double Formula(double Latitude_1, double Longitude_1, double Latitude_2, double 
 
 class Drawer : public osmium::handler::Handler {
 public:
-    AdjacencyList& graph;
+        AdjacencyList& graph;
     int Node_Total = 0;
+    int nodes_parsed = 0;
 
-    const int Node_Max = 100000;
+    const int Node_Max = 300000;
     Drawer(AdjacencyList& list) : graph(list) {}
 
     //override node function
     void node(const osmium::Node& nodes) {
-        if (Node_Total < Node_Max) {
-            graph.insertNode(nodes.id(), nodes.location().lat(), nodes.location().lon());
-            Node_Total++;
+        if (nodes_parsed < Node_Max && Node_Total <= 100000) {
+            if (nodes_parsed % 3 == 0)
+            {
+                graph.insertNode(nodes.id(), nodes.location().lat(), nodes.location().lon());
+                Node_Total++;
+            }
+            nodes_parsed++;
 
             cout << "Node ID: " << nodes.id() << "\t" << Node_Total << "\t";
         }
@@ -83,7 +88,7 @@ void OSMDATA(const string& name, AdjacencyList& graph) {
 }
 
 void GraphVisual(sf::RenderWindow& window, AdjacencyList& graph) {
-    sf::CircleShape nodeShape(2);
+    sf::CircleShape nodeShape(0.1);
     nodeShape.setFillColor(sf::Color::Blue);
     sf::VertexArray edges(sf::Lines);
 
@@ -109,7 +114,7 @@ void GraphVisual(sf::RenderWindow& window, AdjacencyList& graph) {
     // Ensure we maintain the aspect ratio
     double scale = std::min(window.getSize().x / lonRange, window.getSize().y / latRange);
 
-   
+
 
     for (const auto& couple : graph.getAdjacencyList()) {
         int Node_1 = couple.first;
@@ -131,7 +136,7 @@ void GraphVisual(sf::RenderWindow& window, AdjacencyList& graph) {
                     double x2 = (Longitude_2 - minLon) * scale;
                     double y2 = (Latitude_2 - minLat) * scale;
 
-                    
+
 
                     edges.append(sf::Vertex(sf::Vector2f(x1, y1), sf::Color::White));
                     edges.append(sf::Vertex(sf::Vector2f(x2, y2), sf::Color::White));
@@ -149,7 +154,7 @@ void GraphVisual(sf::RenderWindow& window, AdjacencyList& graph) {
         double x = (Longitude - minLon) * scale;
         double y = (Latitude - minLat) * scale;
 
-       
+
 
         nodeShape.setPosition(x, y);
         window.draw(nodeShape);
@@ -167,7 +172,7 @@ int main()
 
     cout << "loaded data, now opening window" << endl;
 
-    sf::RenderWindow window(sf::VideoMode(800, 600), "Project 3");
+    sf::RenderWindow window(sf::VideoMode(1500, 1200), "Project 3");
 
     while (window.isOpen())
     {
