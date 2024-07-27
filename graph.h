@@ -97,41 +97,59 @@ public:
 	}
 
 	vector<int> dijkstras(int startID, int endID) {    //Justin Sui 7/25-7/26
+		//pq to store (distance, node)
 		priority_queue<pair<double, int>, vector<pair<double, int>>, greater<>> pq;
+		//unordered map to store distance from source node to each other node
 		unordered_map<int, double> distances;
-        	unordered_map<int, int> previous;
-        	set<int> visited;
+		//,ap to store the path 
+        unordered_map<int, int> previous;
+		//set to keep track of visited nodes
+       	set<int> visited;
 
+		//distance of source node to source = 0 
   		distances[startID] = 0.0;
-        	pq.push({0.0, startID});
+        pq.push({0.0, startID});
 	 
-	 	while (!pq.empty()) {
+		//parse the queue
+	 	while (!pq.empty()) 
+		{
    			double dist = pq.top().first;
-            		int x = pq.top().second;
-            		pq.pop();
+            int x = pq.top().second;
+            pq.pop();
 
-            		if (visited.find(x) != visited.end()) {
-                		continue;
+			//skip node if already in visited
+            if (visited.find(x) != visited.end()) 
+			{
+                continue;
 			}
-            		visited.insert(x);
-        		if (x == endID) { //construct shortest path
-                		vector<int> pt;
-                		for (int i = endID; i != -1; i = previous[i]) {
-                    		pt.push_back(i);
-                		}
-                		reverse(pt.begin(), pt.end());
-                		return pt;
-            		}
+            
+			visited.insert(x);
 
-            		for (auto& neighbor : graph[x]) {
-                		int y = neighbor.first;
-                		double weight = neighbor.second;
-                		if (visited.find(y) == visited.end() && dist + weight < distances[y]) {
-                    			distances[y] = dist + weight;
-                    			pq.push({distances[y], y});
-                    			previous[y] = x;
-                		}
-            		}
+			//construst path if reached the destination node
+        	if (x == endID) 
+			{ //construct shortest path
+				vector<int> pt;
+                for (int i = endID; i != -1; i = previous[i]) 
+				{
+                    pt.push_back(i);
+                }
+                reverse(pt.begin(), pt.end());
+                return pt;
+            }
+
+			// Iterate over neighbors
+			auto it = graph.equal_range(x);
+			for (auto i = it.first; i != it.second; ++i) {
+				for (auto& neighbor : i->second) {
+					int y = neighbor.first;
+					double weight = neighbor.second;
+					if (visited.find(y) == visited.end() && (distances.find(y) == distances.end() || dist + weight < distances[y])) {
+						distances[y] = dist + weight;
+						pq.push({ distances[y], y });
+						previous[y] = x;
+					}
+				}
+			}
 		}
 	 	return {}; //no path found
 	}
