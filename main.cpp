@@ -86,35 +86,72 @@ void GraphVisual(sf::RenderWindow& window, AdjacencyList& graph) {
     sf::CircleShape nodeShape(2);
     nodeShape.setFillColor(sf::Color::Blue);
     sf::VertexArray edges(sf::Lines);
+
+    // Calculate min and max latitude and longitude for normalization
+    double minLat = std::numeric_limits<double>::max();
+    double maxLat = std::numeric_limits<double>::lowest();
+    double minLon = std::numeric_limits<double>::max();
+    double maxLon = std::numeric_limits<double>::lowest();
+
+    for (const auto& node : graph.getNodeLoc()) {
+        double lat = node.second.first;
+        double lon = node.second.second;
+        if (lat < minLat) minLat = lat;
+        if (lat > maxLat) maxLat = lat;
+        if (lon < minLon) minLon = lon;
+        if (lon > maxLon) maxLon = lon;
+    }
+
+    // Calculate scale factors
+    double latRange = maxLat - minLat;
+    double lonRange = maxLon - minLon;
+
+    // Ensure we maintain the aspect ratio
+    double scale = std::min(window.getSize().x / lonRange, window.getSize().y / latRange);
+
+   
+
     for (const auto& couple : graph.getAdjacencyList()) {
         int Node_1 = couple.first;
         auto it1 = graph.getNodeLoc().equal_range(Node_1);
-        if (it1.first != it1.second)
-        {
+        if (it1.first != it1.second) {
             double Latitude_1 = it1.first->second.first;
             double Longitude_1 = it1.first->second.second;
 
             for (const auto& neighbors : couple.second) {
                 int Node_2 = neighbors.first;
                 auto it2 = graph.getNodeLoc().equal_range(Node_2);
-                if (it2.first != it2.second)
-                {
+                if (it2.first != it2.second) {
                     double Latitude_2 = it2.first->second.first;
                     double Longitude_2 = it2.first->second.second;
-                    sf::Vector2f pos1(Longitude_1 * 1000, Latitude_1 * 1000);
-                    sf::Vector2f pos2(Longitude_2 * 1000, Latitude_2 * 1000);
-                    edges.append(sf::Vertex(pos1, sf::Color::White));
-                    edges.append(sf::Vertex(pos2, sf::Color::White));
+
+                    // Normalize positions and scale
+                    double x1 = (Longitude_1 - minLon) * scale;
+                    double y1 = (Latitude_1 - minLat) * scale;
+                    double x2 = (Longitude_2 - minLon) * scale;
+                    double y2 = (Latitude_2 - minLat) * scale;
+
+                    
+
+                    edges.append(sf::Vertex(sf::Vector2f(x1, y1), sf::Color::White));
+                    edges.append(sf::Vertex(sf::Vector2f(x2, y2), sf::Color::White));
                 }
             }
         }
     }
     window.draw(edges);
-    for (const auto& node : graph.getNodeLoc())
-    {
+
+    for (const auto& node : graph.getNodeLoc()) {
         double Latitude = node.second.first;
         double Longitude = node.second.second;
-        nodeShape.setPosition(Longitude * 1000, Latitude * 1000);
+
+        // Normalize positions and scale
+        double x = (Longitude - minLon) * scale;
+        double y = (Latitude - minLat) * scale;
+
+       
+
+        nodeShape.setPosition(x, y);
         window.draw(nodeShape);
     }
 }
