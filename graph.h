@@ -38,17 +38,39 @@ public:
 	{
 		graph.insert({ fromID, {{toID, weight}} });
 	}
+
+	//function to return weights between 2 connected nodes
+	double getWeight(int fromID, int toID)
+	{
+		auto it = graph.equal_range(fromID);
+		for (auto i = it.first; i != it.second; ++i)
+		{
+			for (const auto& neighbour : i->second)
+			{
+				if (neighbour.first == toID)
+				{
+					return neighbour.second;
+				}
+			}
+		}
+	}
+
 	//code referenced from Lecture Slides - Mod 8a - Graphs Terminology and Implementation -- slide 63
-	vector<int> bfs(int startID, int endID)
+	pair<vector<int>, double> bfs(int startID, int endID)
 	{
 		//create containers for bfs
 		set<int> visited;
 		queue<int> queue;
 		unordered_map<int, int> previous;
 
+		//unordered_map to store weightDist from fromID
+		unordered_map<int, double> weightDist;
+
 		//insert and push startID into visited and queue
 		visited.insert(startID);
 		queue.push(startID);
+
+		weightDist[startID] = 0.0;
 
 		//set node previous to start id as -1
 		previous[startID] = -1;
@@ -68,7 +90,9 @@ public:
 
 				//reverse order of path 
 				reverse(pathTrace.begin(), pathTrace.end());
-				return pathTrace;
+				pair<vector<int>, double> path = make_pair(pathTrace, weightDist[endID]);
+
+				return path;
 			}
 
 			queue.pop();
@@ -86,6 +110,12 @@ public:
 					{
 						visited.insert(v);
 						queue.push(v);
+
+						// set u to be previous of v
+						previous[v] = u;
+
+						//sum of dist
+						weightDist[v] = weightDist[u] + getWeight(u, v);
 					}
 				}
 
@@ -96,46 +126,51 @@ public:
 		return {};
 	}
 
-	vector<int> dijkstras(int startID, int endID) {    //Justin Sui 7/25-7/26
+	pair<vector<int>, double> dijkstras(int startID, int endID) {    //Justin Sui 7/25-7/26
 		//pq to store (distance, node)
 		priority_queue<pair<double, int>, vector<pair<double, int>>, greater<>> pq;
+		
 		//unordered map to store distance from source node to each other node
 		unordered_map<int, double> distances;
-		//,ap to store the path 
-        	unordered_map<int, int> previous;
+		
+		//map to store the path 
+        unordered_map<int, int> previous;
+		
 		//set to keep track of visited nodes
-       		set<int> visited;
+       	set<int> visited;
 
 		//distance of source node to source = 0 
   		distances[startID] = 0.0;
-        	pq.push({0.0, startID});
+        pq.push({0.0, startID});
 	 
 		//parse the queue
 	 	while (!pq.empty()) 
 		{
    			double dist = pq.top().first;
-            		int x = pq.top().second;
-            		pq.pop();
+            int x = pq.top().second;
+            pq.pop();
 
 			//skip node if already in visited
-            		if (visited.find(x) != visited.end()) 
+            if (visited.find(x) != visited.end()) 
 			{
-                		continue;
+                continue;
 			}
             
 			visited.insert(x);
 
 			//construst path if reached the destination node
-        		if (x == endID) 
+        	if (x == endID) 
 			{ //construct shortest path
 				vector<int> pt;
-                		for (int i = endID; i != -1; i = previous[i]) 
+				for (int i = endID; i != -1; i = previous[i])
 				{
-                    			pt.push_back(i);
-                		}
-                		reverse(pt.begin(), pt.end());
-                		return pt;
-            		}
+					pt.push_back(i);
+				}
+                reverse(pt.begin(), pt.end());
+				pair<vector<int>, double> path = make_pair(pt, distances[endID]);
+
+                return path;
+            }
 
 			// Iterate over neighbors
 			auto it = graph.equal_range(x);
@@ -143,8 +178,9 @@ public:
 				for (auto& neighbor : i->second) {
 					int y = neighbor.first;
 					double weight = neighbor.second;
-					if (visited.find(y) == visited.end() && (distances.find(y) == distances.end() || dist + weight < distances[y])) {
-						distances[y] = dist + weight;
+					if (visited.find(y) == visited.end() && (distances.find(y) == distances.end() || dist + weight < distances[y])) 
+					{
+						distances[y] = distances[x] + getWeight(x, y);
 						pq.push({ distances[y], y });
 						previous[y] = x;
 					}
