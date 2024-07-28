@@ -38,9 +38,13 @@ public:
     //override node function
     void node(const osmium::Node& nodes) {
         //parse 200k nodes and insert every other node
-        if (Node_Total < Node_Max) {
-            graph.insertNode(nodes.id(), nodes.location().lat(), nodes.location().lon());
-            Node_Total++;
+        if (Node_Total < Node_Max && Node_Total <= 100000) {
+            if (nodes_parsed % 2  == 0)
+            {
+                graph.insertNode(nodes.id(), nodes.location().lat(), nodes.location().lon());
+                Node_Total++;
+            }
+            nodes_parsed++;
 
             cout << "Node ID: " << nodes.id() << "\t" << Node_Total << "\t";
         }
