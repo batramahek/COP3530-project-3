@@ -27,19 +27,19 @@ double Formula(double Latitude_1, double Longitude_1, double Latitude_2, double 
 
 class Drawer : public osmium::handler::Handler {
 public:
-        AdjacencyList& graph;
+    AdjacencyList& graph;
     int Node_Total = 0;
     int nodes_parsed = 0;
 
-    
-    const int Node_Max = 200000;
+
+    const int Node_Max = 400000;
     Drawer(AdjacencyList& list) : graph(list) {}
 
     //override node function
     void node(const osmium::Node& nodes) {
         //parse 200k nodes and insert every other node
-        if (Node_Total < Node_Max && Node_Total <= 100000) {
-            if (nodes_parsed % 2  == 0)
+        if (Node_Total < Node_Max && Node_Total <= 200000) {
+            if (nodes_parsed % 2 == 0)
             {
                 graph.insertNode(nodes.id(), nodes.location().lat(), nodes.location().lon());
                 Node_Total++;
@@ -90,7 +90,7 @@ void OSMDATA(const string& name, AdjacencyList& graph) {
 }
 
 void GraphVisual(sf::RenderWindow& window, AdjacencyList& graph) {
-    sf::CircleShape nodeShape(0.1);
+    sf::CircleShape nodeShape(0.3);
     nodeShape.setFillColor(sf::Color::Blue);
     sf::VertexArray edges(sf::Lines);
 
