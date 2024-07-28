@@ -1,11 +1,14 @@
 #include <SFML/Graphics.hpp>
 #include "graph.h"
+#include <random>
 #include <unordered_map>
 #include <iostream>
+#include <chrono>
 #include <unordered_map>
 #include <osmium/io/any_input.hpp>
 #include <osmium/handler.hpp>
 #include <osmium/visitor.hpp>
+#include <vector>
 #define pi 3.14159265358979323846
 
 //Earth Radius in Kilometers found online
@@ -37,7 +40,7 @@ public:
 
     //override node function
     void node(const osmium::Node& nodes) {
-        //parse 200k nodes and insert every other node
+        //parse 400k nodes and insert every other node
         if (Node_Total < Node_Max && Node_Total <= 200000) {
             if (nodes_parsed % 2 == 0)
             {
@@ -89,6 +92,7 @@ void OSMDATA(const string& name, AdjacencyList& graph) {
     reader.close();
 }
 
+//function to visualize the nodes and edges
 void GraphVisual(sf::RenderWindow& window, AdjacencyList& graph) {
     sf::CircleShape nodeShape(0.3);
     nodeShape.setFillColor(sf::Color::Blue);
@@ -109,11 +113,11 @@ void GraphVisual(sf::RenderWindow& window, AdjacencyList& graph) {
         if (lon > maxLon) maxLon = lon;
     }
 
-    // Calculate scale factors
+    // Scale Factor calculation
     double latRange = maxLat - minLat;
     double lonRange = maxLon - minLon;
 
-    // Ensure we maintain the aspect ratio
+    // Aspect Ration calculation
     double scale = std::min(window.getSize().x / lonRange, window.getSize().y / latRange);
 
 
@@ -132,7 +136,7 @@ void GraphVisual(sf::RenderWindow& window, AdjacencyList& graph) {
                     double Latitude_2 = it2.first->second.first;
                     double Longitude_2 = it2.first->second.second;
 
-                    // Normalize positions and scale
+                    // Postionize based on lat and long
                     double x1 = (Longitude_1 - minLon) * scale;
                     double y1 = (Latitude_1 - minLat) * scale;
                     double x2 = (Longitude_2 - minLon) * scale;
@@ -152,7 +156,7 @@ void GraphVisual(sf::RenderWindow& window, AdjacencyList& graph) {
         double Latitude = node.second.first;
         double Longitude = node.second.second;
 
-        // Normalize positions and scale
+        
         double x = (Longitude - minLon) * scale;
         double y = (Latitude - minLat) * scale;
 
@@ -173,6 +177,46 @@ int main()
     OSMDATA(osm_filename, graph);
 
     cout << "loaded data, now opening window" << endl;
+
+    // Helps extract the node Id to randomize
+    vector<int> Node_Id;
+    for (const auto& node : graph.getNodeLoc()) {
+        Node_Id.push_back(node.first);
+    }
+
+    // Randomize Node selection
+    random_device randomize;
+    mt19937 ID(randomize());
+    uniform_int_distribution<> distance(0, Node_Id.size() - 1);
+
+    int Begin_Id = Node_Id[distance(ID)];
+    int Finish_Id = Node_Id[distance(ID)];
+
+    // Times the Dijkstra function
+    auto Dijkstra_Timer_Start = chrono::high_resolution_clock::now();
+    auto Dijkstra_Timer_Result = graph.dijkstras(Begin_Id, Finish_Id);
+    auto Dijkstra_Timer_End = chrono::high_resolution_clock::now();
+    chrono::duration<double> Dur1 = Dijkstra_Timer_End - Dijkstra_Timer_Start;
+
+    // Times the BFS function
+    auto BFS_Timer_Start = chrono::high_resolution_clock::now();
+    auto BFS_Timer_Result = graph.bfs(Begin_Id, Finish_Id);
+    auto BFS_Timer_End = chrono::high_resolution_clock::now();
+    chrono::duration<double> Dur2 = BFS_Timer_End - BFS_Timer_Start;
+
+    if (Dijkstra_Timer_Result.first.empty()) {
+        cout << "Could not find path between Node ID: "<< Begin_Id << " and " << Finish_Id << "." << endl;
+    }
+    else {
+        cout << "Dijkstra Time Taken: " << Dur1.count() << " seconds!";
+    }
+
+    if (BFS_Timer_Result.first.empty()) {
+        cout << "Could not find path between Node ID: " << Begin_Id << " and " << Finish_Id << "." << endl;
+    }
+    else {
+        cout << "BFS Time Taken: " << Dur2.count() << " seconds!";
+    }
 
     sf::RenderWindow window(sf::VideoMode(1500, 1200), "Project 3");
 
