@@ -35,14 +35,15 @@ public:
     int nodes_parsed = 0;
 
 
-    const int Node_Max = 400000;
+    //const int Node_Max = 400000;
+    const int Node_Max = 1000;
     Drawer(AdjacencyList& list) : graph(list) {}
 
     //override node function
     void node(const osmium::Node& nodes) {
         //parse 400k nodes and insert every other node
-        if (Node_Total < Node_Max && Node_Total <= 200000) {
-            if (nodes_parsed % 2 == 0)
+        if (Node_Total < Node_Max && Node_Total <= 200) {
+            if (nodes_parsed % 5 == 0)
             {
                 graph.insertNode(nodes.id(), nodes.location().lat(), nodes.location().lon());
                 Node_Total++;

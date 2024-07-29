@@ -4,6 +4,7 @@
 //
 #include <unordered_map>
 #include <vector>
+#include <iostream>
 #pragma once
 //
 // Created by Mahek Batra on 2024-07-15.
@@ -36,7 +37,16 @@ public:
 	}
 	void insertEdge(int fromID, int toID, double weight)
 	{
-		graph.insert({ fromID, {{toID, weight}} });
+		//graph.insert({ fromID, {{toID, weight}} });
+		auto itFrom = graph.find(fromID);
+		if (itFrom != graph.end())
+		{
+			itFrom->second.push_back({ toID, weight });
+		}
+		else
+		{
+			graph.insert({ fromID, {{toID, weight}} });
+		}
 	}
 
 	//function to return weights between 2 connected nodes
@@ -53,6 +63,7 @@ public:
 				}
 			}
 		}
+		return -1; // or 0
 	}
 
 	//code referenced from Lecture Slides - Mod 8a - Graphs Terminology and Implementation -- slide 63
@@ -78,6 +89,8 @@ public:
 		while (!queue.empty())
 		{
 			int u = queue.front();
+			queue.pop();
+			cout << "Visiting node: " << u << endl;
 
 			//checks if u is the same as the endID, add it to the path and keep adding the previous nodes until it reaches the previous[start] which is -1
 			if (u == endID)
@@ -92,13 +105,18 @@ public:
 				reverse(pathTrace.begin(), pathTrace.end());
 				pair<vector<int>, double> path = make_pair(pathTrace, weightDist[endID]);
 
+				cout << "Path found: ";
+				for (int node : pathTrace) {
+					cout << node << " ";
+				}
+				cout << " with total weight: " << weightDist[endID] << endl;
+
 				return path;
 			}
 
-			queue.pop();
 
 			//check if element is in the visited set, if its not, add it to vector and queue
-			vector<int> neighbours;
+			//vector<int> neighbours;
 			auto it = graph.equal_range(u);
 			for (auto& i = it.first; i != it.second; ++i)
 			{
@@ -106,6 +124,7 @@ public:
 				for (const auto& neighbour : i->second)
 				{
 					int v = neighbour.first;
+					cout << "Checking neighbour: " << v << " of node: " << u << endl;
 					if (visited.count(v) == 0)
 					{
 						visited.insert(v);
