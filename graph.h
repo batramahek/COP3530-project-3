@@ -106,7 +106,8 @@ public:
 				pair<vector<int>, double> path = make_pair(pathTrace, weightDist[endID]);
 
 				cout << "Path found: ";
-				for (int node : pathTrace) {
+				for (int node : pathTrace) 
+				{
 					cout << node << " ";
 				}
 				cout << " with total weight: " << weightDist[endID] << endl;
@@ -170,7 +171,8 @@ public:
             		pq.pop();
 
 			//skip node if already in visited
-            		if (visited.find(x) != visited.end()) {
+            		if (visited.find(x) != visited.end()) 
+			{
                 		continue;
 	    		}
             
@@ -192,8 +194,10 @@ public:
 
 		// Iterate over neighbors
 			auto it = graph.equal_range(x);
-			for (auto i = it.first; i != it.second; ++i) {
-				for (const auto& neighbor : i->second) {
+			for (auto i = it.first; i != it.second; ++i) 
+			{
+				for (const auto& neighbor : i->second) 
+				{
 					int y = neighbor.first;
 					double weight = neighbor.second;
 					if (visited.find(y) == visited.end() && (distances.find(y) == distances.end() || dist + weight < distances[y])) 
