@@ -86,11 +86,16 @@ public:
 };
 
 //function to load OSM data
-void OSMDATA(const string& name, AdjacencyList& graph) {
-    osmium::io::Reader reader(name);
-    Drawer handler(graph);
-    osmium::apply(reader, handler);
-    reader.close();
+void OSMDATA(const string& name, AdjacencyList& graph) {    //error handling
+    try {
+        osmium::io::Reader reader(name);
+        Drawer handler(graph);
+        osmium::apply(reader, handler);
+        reader.close();
+    } 
+    catch (const std::exception& e) {
+        cerr << "Error loading OSM data: " << e.what() << endl;
+    }
 }
 
 //function to visualize the nodes and edges
