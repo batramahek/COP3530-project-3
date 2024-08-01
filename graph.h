@@ -194,7 +194,7 @@ public:
 			// Iterate over neighbors
 			auto it = graph.equal_range(x);
 			for (auto i = it.first; i != it.second; ++i) {
-				for (auto& neighbor : i->second) {
+				for (const auto& neighbor : i->second) {
 					int y = neighbor.first;
 					double weight = neighbor.second;
 					if (visited.find(y) == visited.end() && (distances.find(y) == distances.end() || dist + weight < distances[y])) 
