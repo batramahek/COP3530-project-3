@@ -35,22 +35,18 @@ public:
     int nodes_parsed = 0;
 
 
-    //const int Node_Max = 400000;
-    const int Node_Max = 1000;
+    const int Node_Max = 30000000;
+
     Drawer(AdjacencyList& list) : graph(list) {}
 
     //override node function
     void node(const osmium::Node& nodes) {
-        //parse 400k nodes and insert every other node
-        if (Node_Total < Node_Max && Node_Total <= 200) {
-            if (nodes_parsed % 5 == 0)
-            {
-                graph.insertNode(nodes.id(), nodes.location().lat(), nodes.location().lon());
-                Node_Total++;
-            }
-            nodes_parsed++;
+        //parse 400k nodes
+        if (Node_Total < Node_Max) {
 
-            cout << "Node ID: " << nodes.id() << "\t" << Node_Total << "\t";
+            graph.insertNode(nodes.id(), nodes.location().lat(), nodes.location().lon());
+            Node_Total++;
+            nodes_parsed++;
         }
     }
 
@@ -76,26 +72,23 @@ public:
                     double lon2 = to->second.second;
 
                     double dist = Formula(lat1, lon1, lat2, lon2);
+
+                    
+
                     graph.insertEdge(fromID, toID, dist);
                 }
-
+            
             }
         }
-
     }
 };
 
 //function to load OSM data
-void OSMDATA(const string& name, AdjacencyList& graph) {    //error handling
-    try {
-        osmium::io::Reader reader(name);
-        Drawer handler(graph);
-        osmium::apply(reader, handler);
-        reader.close();
-    } 
-    catch (const std::exception& e) {
-        cerr << "Error loading OSM data: " << e.what() << endl;
-    }
+void OSMDATA(const string& name, AdjacencyList& graph) {
+    osmium::io::Reader reader(name);
+    Drawer handler(graph);
+    osmium::apply(reader, handler);
+    reader.close();
 }
 
 //function to visualize the nodes and edges
@@ -162,7 +155,7 @@ void GraphVisual(sf::RenderWindow& window, AdjacencyList& graph) {
         double Latitude = node.second.first;
         double Longitude = node.second.second;
 
-        
+
         double x = (Longitude - minLon) * scale;
         double y = (Latitude - minLat) * scale;
 
@@ -177,7 +170,7 @@ void GraphVisual(sf::RenderWindow& window, AdjacencyList& graph) {
 int main()
 {
     //store osm file name and pass through function to load data
-    string osm_filename = "florida-latest.osm.pbf";
+    string osm_filename = "massachusetts-latest.osm.pbf";
     AdjacencyList graph;
     cout << "loading data in" << endl;
     OSMDATA(osm_filename, graph);
@@ -191,12 +184,15 @@ int main()
     }
 
     // Randomize Node selection
-    random_device randomize;
-    mt19937 ID(randomize());
-    uniform_int_distribution<> distance(0, Node_Id.size() - 1);
+    //random_device randomize;
+    //mt19937 ID(randomize());
+    //uniform_int_distribution<> distance(0, Node_Id.size() - 1);
 
-    int Begin_Id = Node_Id[distance(ID)];
-    int Finish_Id = Node_Id[distance(ID)];
+    // int Begin_Id = Node_Id[distance(ID)];
+    //int Finish_Id = Node_Id[distance(ID)];
+
+    int Begin_Id = 6370679543;
+    int Finish_Id = 6370679551;
 
     // Times the Dijkstra function
     auto Dijkstra_Timer_Start = chrono::high_resolution_clock::now();
@@ -211,17 +207,17 @@ int main()
     chrono::duration<double> Dur2 = BFS_Timer_End - BFS_Timer_Start;
 
     if (Dijkstra_Timer_Result.first.empty()) {
-        cout << "Could not find path between Node ID: "<< Begin_Id << " and " << Finish_Id << "." << endl;
+        cout << "Could not find path between Node ID: " << Begin_Id << " and " << Finish_Id << "." << endl;
     }
     else {
-        cout << "Dijkstra Time Taken: " << Dur1.count() << " seconds!";
+        cout << "Dijkstra Time Taken: " << Dur1.count() << " seconds!" << endl;
     }
 
     if (BFS_Timer_Result.first.empty()) {
         cout << "Could not find path between Node ID: " << Begin_Id << " and " << Finish_Id << "." << endl;
     }
     else {
-        cout << "BFS Time Taken: " << Dur2.count() << " seconds!";
+        cout << "BFS Time Taken: " << Dur2.count() << " seconds!" << endl;
     }
 
     sf::RenderWindow window(sf::VideoMode(1500, 1200), "Project 3");

@@ -2,8 +2,13 @@
 //
 // Created by Mahek Batra on 2024-07-15.
 //
+#include <unordered_map>
 #include <vector>
 #include <iostream>
+#pragma once
+//
+// Created by Mahek Batra on 2024-07-15.
+//
 #include <unordered_map>
 #include <set>
 #include <queue>
@@ -85,7 +90,7 @@ public:
 		{
 			int u = queue.front();
 			queue.pop();
-			cout << "Visiting node: " << u << endl;
+			
 
 			//checks if u is the same as the endID, add it to the path and keep adding the previous nodes until it reaches the previous[start] which is -1
 			if (u == endID)
@@ -101,8 +106,7 @@ public:
 				pair<vector<int>, double> path = make_pair(pathTrace, weightDist[endID]);
 
 				cout << "Path found: ";
-				for (int node : pathTrace) 
-				{
+				for (int node : pathTrace) {
 					cout << node << " ";
 				}
 				cout << " with total weight: " << weightDist[endID] << endl;
@@ -120,7 +124,7 @@ public:
 				for (const auto& neighbour : i->second)
 				{
 					int v = neighbour.first;
-					cout << "Checking neighbour: " << v << " of node: " << u << endl;
+					
 					if (visited.count(v) == 0)
 					{
 						visited.insert(v);
@@ -144,58 +148,57 @@ public:
 	pair<vector<int>, double> dijkstras(int startID, int endID) {    //Justin Sui 7/25-7/26
 		//pq to store (distance, node)
 		priority_queue<pair<double, int>, vector<pair<double, int>>, greater<>> pq;
-		
+
 		//unordered map to store distance from source node to each other node
 		unordered_map<int, double> distances;
-		
+
 		//map to store the path 
-        	unordered_map<int, int> previous;
-		
+		unordered_map<int, int> previous;
+
 		//set to keep track of visited nodes
-       		set<int> visited;
+		set<int> visited;
 
 		//distance of source node to source = 0 
-  		distances[startID] = 0.0;
-        	pq.push({0.0, startID});
-	 
+		distances[startID] = 0.0;
+		pq.push({ 0.0, startID });
+		previous[startID] = -1;
+
 		//parse the queue
-	 	while (!pq.empty()) 
+		while (!pq.empty())
 		{
-   			double dist = pq.top().first;
-            		int x = pq.top().second;
-            		pq.pop();
+			double dist = pq.top().first;
+			int x = pq.top().second;
+			pq.pop();
 
 			//skip node if already in visited
-            		if (visited.find(x) != visited.end()) 
+			if (visited.find(x) != visited.end())
 			{
-                		continue;
-	    		}
-            
+				continue;
+			}
+
 			visited.insert(x);
 
 			//construst path if reached the destination node
-        		if (x == endID) 
+			if (x == endID)
 			{ //construct shortest path
 				vector<int> pt;
 				for (int i = endID; i != -1; i = previous[i])
 				{
 					pt.push_back(i);
 				}
-                		reverse(pt.begin(), pt.end());
+				reverse(pt.begin(), pt.end());
 				pair<vector<int>, double> path = make_pair(pt, distances[endID]);
 
-                		return path;
-            		}
+				return path;
+			}
 
-		// Iterate over neighbors
+			// Iterate over neighbors
 			auto it = graph.equal_range(x);
-			for (auto i = it.first; i != it.second; ++i) 
-			{
-				for (const auto& neighbor : i->second) 
-				{
+			for (auto i = it.first; i != it.second; ++i) {
+				for (auto& neighbor : i->second) {
 					int y = neighbor.first;
 					double weight = neighbor.second;
-					if (visited.find(y) == visited.end() && (distances.find(y) == distances.end() || dist + weight < distances[y])) 
+					if (visited.find(y) == visited.end() && (distances.find(y) == distances.end() || dist + weight < distances[y]))
 					{
 						distances[y] = distances[x] + getWeight(x, y);
 						pq.push({ distances[y], y });
@@ -203,8 +206,9 @@ public:
 					}
 				}
 			}
+		
 		}
-	 	return {}; //no path found
+		return {}; //no path found
 	}
 
 
