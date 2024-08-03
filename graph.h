@@ -5,16 +5,10 @@
 #include <unordered_map>
 #include <vector>
 #include <iostream>
-#pragma once
-//
-// Created by Mahek Batra on 2024-07-15.
-//
-#include <unordered_map>
 #include <set>
 #include <queue>
 #include <string>
 #include <functional> // for priority queue
-
 
 
 #ifndef COP3530_PROJECT_3_GRAPH_H
@@ -145,7 +139,8 @@ public:
 		return {};
 	}
 
-	pair<vector<int>, double> dijkstras(int startID, int endID) {    //Justin Sui 7/25-7/26
+	pair<vector<int>, double> dijkstras(int startID, int endID)    //Justin Sui 7/25-7/26
+	{    
 		//pq to store (distance, node)
 		priority_queue<pair<double, int>, vector<pair<double, int>>, greater<>> pq;
 
