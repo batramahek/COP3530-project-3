@@ -73,11 +73,11 @@ public:
 
                     double dist = Formula(lat1, lon1, lat2, lon2);
 
-                    
+
 
                     graph.insertEdge(fromID, toID, dist);
                 }
-            
+
             }
         }
     }
@@ -92,10 +92,12 @@ void OSMDATA(const string& name, AdjacencyList& graph) {
 }
 
 //function to visualize the nodes and edges
-void GraphVisual(sf::RenderWindow& window, AdjacencyList& graph) {
+void GraphVisual(sf::RenderWindow& window, AdjacencyList& graph, vector<int>& DijkstrasResult, vector<int>& BFSResult) {
     sf::CircleShape nodeShape(0.3);
     nodeShape.setFillColor(sf::Color::Blue);
     sf::VertexArray edges(sf::Lines);
+    sf::VertexArray bfsPath(sf::LinesStrip);
+    sf::VertexArray dijkstraPath(sf::LinesStrip);
 
     // Calculate min and max latitude and longitude for normalization
     double minLat = std::numeric_limits<double>::max();
@@ -149,7 +151,57 @@ void GraphVisual(sf::RenderWindow& window, AdjacencyList& graph) {
             }
         }
     }
+
+    if (BFSResult.size() >= 1)
+    {
+        for (size_t i = 0; i < BFSResult.size() - 1; ++i)
+        {
+            int fromNodeID = BFSResult[i];
+            int toNodeID = BFSResult[i + 1];
+
+            auto fromNode = graph.getNodeLoc().find(fromNodeID);
+            auto toNode = graph.getNodeLoc().find(toNodeID);
+
+            if (fromNode != graph.getNodeLoc().end() && toNode != graph.getNodeLoc().end())
+            {
+                double x1 = (fromNode->second.second - minLon) * scale;
+                double y1 = (fromNode->second.first - minLat) * scale;
+                double x2 = (toNode->second.second - minLon) * scale;
+                double y2 = (toNode->second.first - minLat) * scale;
+
+                bfsPath.append(sf::Vertex(sf::Vector2f(x1, y1), sf::Color::Magenta));
+                bfsPath.append(sf::Vertex(sf::Vector2f(x2, y2), sf::Color::Magenta));
+            }
+        }
+    }
+
+    if (DijkstrasResult.size() >= 1)
+    {
+        for (size_t i = 0; i < DijkstrasResult.size() - 1; ++i)
+        {
+            int fromNodeID = DijkstrasResult[i];
+            int toNodeID = DijkstrasResult[i + 1];
+
+            auto fromNode = graph.getNodeLoc().find(fromNodeID);
+            auto toNode = graph.getNodeLoc().find(toNodeID);
+
+            if (fromNode != graph.getNodeLoc().end() && toNode != graph.getNodeLoc().end())
+            {
+                double x1 = (fromNode->second.second - minLon) * scale;
+                double y1 = (fromNode->second.first - minLat) * scale;
+                double x2 = (toNode->second.second - minLon) * scale;
+                double y2 = (toNode->second.first - minLat) * scale;
+
+                dijkstraPath.append(sf::Vertex(sf::Vector2f(x1, y1), sf::Color::Cyan));
+                dijkstraPath.append(sf::Vertex(sf::Vector2f(x2, y2), sf::Color::Cyan));
+            }
+        }
+    }
+
+
     window.draw(edges);
+    window.draw(bfsPath);
+    window.draw(dijkstraPath);
 
     for (const auto& node : graph.getNodeLoc()) {
         double Latitude = node.second.first;
@@ -184,25 +236,25 @@ int main()
     }
 
     // Randomize Node selection
-    //random_device randomize;
-    //mt19937 ID(randomize());
-    //uniform_int_distribution<> distance(0, Node_Id.size() - 1);
+    random_device randomize;
+    mt19937 ID(randomize());
+    uniform_int_distribution<> distance(0, Node_Id.size() - 1);
+    int Begin_Id = Node_Id[distance(ID)];
+    int Finish_Id = Node_Id[distance(ID)];
 
-    // int Begin_Id = Node_Id[distance(ID)];
-    //int Finish_Id = Node_Id[distance(ID)];
-
-    int Begin_Id = 6370679543;
-    int Finish_Id = 6370679551;
+    // Please use this instead of the randomize code above to run perfectly.
+    //int Begin_Id = 61837663;
+    //int Finish_Id = 61883796;
 
     // Times the Dijkstra function
     auto Dijkstra_Timer_Start = chrono::high_resolution_clock::now();
-    auto Dijkstra_Timer_Result = graph.dijkstras(Begin_Id, Finish_Id);
+    pair<vector<int>, double> Dijkstra_Timer_Result = graph.dijkstras(Begin_Id, Finish_Id);
     auto Dijkstra_Timer_End = chrono::high_resolution_clock::now();
     chrono::duration<double> Dur1 = Dijkstra_Timer_End - Dijkstra_Timer_Start;
 
     // Times the BFS function
     auto BFS_Timer_Start = chrono::high_resolution_clock::now();
-    auto BFS_Timer_Result = graph.bfs(Begin_Id, Finish_Id);
+    pair<vector<int>, double> BFS_Timer_Result = graph.bfs(Begin_Id, Finish_Id);
     auto BFS_Timer_End = chrono::high_resolution_clock::now();
     chrono::duration<double> Dur2 = BFS_Timer_End - BFS_Timer_Start;
 
@@ -231,7 +283,7 @@ int main()
                 window.close();
         }
         window.clear();
-        GraphVisual(window, graph);
+        GraphVisual(window, graph, Dijkstra_Timer_Result.first, BFS_Timer_Result.first);
         window.display();
     }
     return 0;
